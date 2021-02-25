@@ -6,8 +6,7 @@ import Home from "../routes/Home"
 import Profile from "../routes/Profile";
 
 
-export default () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+export default ({isLoggedIn}) => {
     return (
         <Router>
             <Switch>
