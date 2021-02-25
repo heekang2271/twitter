@@ -1,68 +1,68 @@
 import { authService, firebaseInstance } from "myBase";
-import React, {useState} from "react";
+import React, { useState } from "react";
 
 export default () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [newAccount, setNewAccount] = useState(true);
+    const [isNewAccount, setIsNewAccount] = useState(false);
 
     const onChange = (event) => {
         const {
-            target: { name, value }
+            target: { value, name }
         } = event;
 
         if (name === "email") {
-            setEmail(value)
+            setEmail(value);
         } else if (name === "password") {
             setPassword(value);
         }
     }
+
     const onSubmit = async (event) => {
         event.preventDefault();
+
         try {
-            let data = null;
-            if (newAccount) {
-                // create account
-                data =await authService.createUserWithEmailAndPassword(email, password);
+            if (isNewAccount) {
+                await authService.createUserWithEmailAndPassword(email, password);
             } else {
-                // log in
-                data =await authService.signInWithEmailAndPassword(email, password);
+                await authService.signInWithEmailAndPassword(email, password);
             }
-            console.log(data);
         } catch (error) {
             console.log(error);
         }
     }
 
-    const toggleAccount = () => setNewAccount((prev) => !prev);
-    const onSocialClick = async (event) => {
+    const toggleClick = () => {
+        setIsNewAccount((prev) => !prev)
+    }
+
+    const onSocialClick = (event) => {
         const {
             target: { name }
         } = event;
-
         let provider;
-
         if (name === "google") {
             provider = new firebaseInstance.auth.GoogleAuthProvider();
-            console.log("asdf");
         } else if (name === "github") {
             provider = new firebaseInstance.auth.GithubAuthProvider();
         }
 
-        await authService.signInWithPopup(provider);
+        authService.signInWithPopup(provider);
     }
+
+
     return (
-        <div>
+        <>
             <form onSubmit={ onSubmit }>
-                <input name="email" type="text" placeholder="Email" required value={email} onChange={onChange} />
-                <input name="password" type="password" placeholder="Password" required value={password} onChange={onChange} />
-                <input type="submit" value={ newAccount ? "Create Account" : "Log In" }/>
+                <input name="email" type="text" placeholder="E-mail" value={email} onChange={onChange}/>
+                <input name="password" type="password" placeholder="Password" value={password} onChange={onChange}/>
+                <input type="submit" value={ isNewAccount ? "create account" : "Log In" }/>
             </form>
-            <span onClick={toggleAccount}>{ newAccount ? "Log in" : "Create Account" }</span>
+            <span onClick={toggleClick}>{ isNewAccount ? "Log in" : "create account" }</span>
             <div>
-                <button onClick={onSocialClick} name="google">Continue with Google</button>
-                <button onClick={onSocialClick} name="github">Continue with Github</button>
+                <button onClick={onSocialClick} name="google">google</button>
+                <button onClick={onSocialClick} name="github">github</button>
             </div>
-        </div>
+        </>
     )
 }
